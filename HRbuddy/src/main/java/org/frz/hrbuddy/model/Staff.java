@@ -28,9 +28,19 @@ public class Staff {
     private String phone;
     private String personalEmail;
     private String workEmail;
-    private String department;
-    private String location;
+
+    @OneToOne
+    @JsonManagedReference
+    @JoinColumn
+    private Department department;
+
+    @OneToOne
+    @JsonManagedReference
+    @JoinColumn
+    private Location location;
+
     private String jobTitle;
+
     private Date dateOfBirth;
 
     @ManyToOne

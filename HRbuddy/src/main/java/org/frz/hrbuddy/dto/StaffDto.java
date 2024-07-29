@@ -6,16 +6,15 @@ import java.util.Date;
 
 @Data
 public class StaffDto {
-    private Long userId;
     private String name;
     private String position;
     private String phone;
     private Date dateOfBirth;
     private String personalEmail;
     private String workEmail;
-    private String department;
+    private int departmentId;
     private Staff supervisor;
-    private String location;
+    private int locationId;
     private String jobTitle;
     private int JobLevel;
     private double currentSalary;

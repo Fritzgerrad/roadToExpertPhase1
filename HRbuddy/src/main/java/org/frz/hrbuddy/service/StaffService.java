@@ -2,10 +2,15 @@ package org.frz.hrbuddy.service;
 
 import lombok.RequiredArgsConstructor;
 import org.frz.hrbuddy.dto.StaffDto;
+import org.frz.hrbuddy.model.Department;
+import org.frz.hrbuddy.model.Location;
 import org.frz.hrbuddy.model.Staff;
 import org.frz.hrbuddy.model.User;
+import org.frz.hrbuddy.repository.DepartmentRepository;
+import org.frz.hrbuddy.repository.LocationRepository;
 import org.frz.hrbuddy.repository.StaffRepository;
 import org.frz.hrbuddy.repository.UserRepository;
+import org.frz.hrbuddy.util.StaffUtil;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
@@ -16,24 +21,28 @@ import java.util.List;
 public class StaffService {
     private final StaffRepository staffRepository;
     private final UserRepository userRepository;
+    private final LocationRepository locationRepository;
+    private final DepartmentRepository departmentRepository;
+    private final StaffUtil staffUtil;
     public String addStaff(StaffDto staffDto) {
-        User user = userRepository.findById(staffDto.getUserId()).orElse(
-                userRepository.save(
+        Department department = departmentRepository.findById(staffDto.getDepartmentId());
+        Location location = locationRepository.findById(staffDto.getLocationId());
+        User user = userRepository.save(
                         User.builder()
-                                .username("user"+new Date().toString())
+                                .username(staffUtil.generateUsername(staffDto.getName(),location,department))
                                 .password("123456")
                                 .role("staff")
-                                .build()));
+                                .build());
         Staff staff = Staff.builder()
                 .user(user)
                 .name(staffDto.getName())
                 .phone(staffDto.getPhone())
-                .department(staffDto.getDepartment())
+                .department(department)
+                .location(location)
                 .position(staffDto.getPosition())
                 .personalEmail(staffDto.getPersonalEmail())
                 .dateOfBirth(staffDto.getDateOfBirth())
                 .workEmail(staffDto.getWorkEmail())
-                .department(staffDto.getDepartment())
                 .jobTitle(staffDto.getJobTitle())
                 .jobLevel(staffDto.getJobLevel())
                 .currentSalary(staffDto.getCurrentSalary())
@@ -47,9 +56,9 @@ public class StaffService {
     public String editStaff(Long staffId, StaffDto staffDto){
         Staff staff = staffRepository.findById(staffId).orElse(null);
         if (staff != null) {
-        staff.setDepartment(staffDto.getDepartment());
+        staff.setDepartment((departmentRepository.findById(staffDto.getDepartmentId())));
         staff.setPosition(staffDto.getPosition());
-        staff.setDepartment(staffDto.getDepartment());
+        staff.setDepartment(departmentRepository.findById(staffDto.getDepartmentId()));
         staff.setJobTitle(staffDto.getJobTitle());
         staff.setJobLevel(staffDto.getJobLevel());
         staff.setCurrentSalary(staffDto.getCurrentSalary());
@@ -95,11 +104,6 @@ public class StaffService {
         return staffRepository.findAll();
     }
 
-    //To be worked on Later and moved to a utility class
-    public String getUsernameFromToken(String token){
-        return "username";
-    }
-
     public String changeSalary(Long staffId, double salary) {
         Staff staff = staffRepository.findById(staffId).orElse(null);
         if (staff != null) {
@@ -110,10 +114,10 @@ public class StaffService {
         return "Unsuccessful";
     }
 
-    public String changeDepartment(Long staffId, String department) {
+    public String changeDepartment(Long staffId, int departmentId) {
         Staff staff = staffRepository.findById(staffId).orElse(null);
         if (staff != null) {
-            staff.setDepartment(department);
+            staff.setDepartment(departmentRepository.findById(departmentId));
             staffRepository.save(staff);
             return "Successful";
         }
@@ -130,10 +134,10 @@ public class StaffService {
         return "Unsuccessful";
     }
 
-    public String changeLocation(Long staffId, String location){
+    public String changeLocation(Long staffId, int locationId){
         Staff staff = staffRepository.findById(staffId).orElse(null);
         if (staff != null) {
-            staff.setLocation(location);
+            staff.setLocation(locationRepository.findById(locationId));
             staffRepository.save(staff);
             return "Successful";
         }
