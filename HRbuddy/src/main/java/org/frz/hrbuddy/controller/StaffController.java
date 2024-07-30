@@ -2,6 +2,7 @@ package org.frz.hrbuddy.controller;
 
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
+import org.frz.hrbuddy.dto.StaffDto;
 import org.frz.hrbuddy.model.Staff;
 import org.frz.hrbuddy.service.StaffService;
 import org.frz.hrbuddy.util.StaffUtil;
@@ -19,9 +20,9 @@ public class StaffController {
     private final StaffUtil staffUtil;
 
     @GetMapping("/me")
-    public ResponseEntity<Staff> getStaff(@RequestHeader("Authorization") String token){
+    public ResponseEntity<StaffDto> getStaff(@RequestHeader("Authorization") String token){
         String username  = staffUtil.getUsernameFromToken(token);
-        Staff staff = staffService.findStaff(username);
+        StaffDto staff = staffService.findStaff(username);
         return ResponseEntity.ok(staff);
     }
 }

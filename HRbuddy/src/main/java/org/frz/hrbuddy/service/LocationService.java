@@ -7,6 +7,7 @@ import org.frz.hrbuddy.model.Staff;
 import org.frz.hrbuddy.repository.LocationRepository;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -14,12 +15,16 @@ import java.util.List;
 public class LocationService {
     private final LocationRepository locationRepository;
 
-    public List<Location> getAllLocations() {
-        return locationRepository.findAll();
+    public List<LocationDto> getAllLocations() {
+        List<LocationDto> locationDtos = new ArrayList<>();
+        for(Location location : locationRepository.findAll()){
+            locationDtos.add(LocationDto.from(location));
+        }
+        return locationDtos;
     }
 
-    public Location getLocationById(int id) {
-        return locationRepository.findById(id);
+    public LocationDto getLocationById(int id) {
+        return LocationDto.from(locationRepository.findById(id));
     }
 
     public Location newLocation(LocationDto locationDto) {

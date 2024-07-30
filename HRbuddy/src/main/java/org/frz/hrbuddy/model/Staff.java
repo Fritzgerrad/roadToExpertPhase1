@@ -1,10 +1,12 @@
 package org.frz.hrbuddy.model;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.util.Date;
+import java.time.LocalDate;
+import java.util.List;
 import java.util.Set;
 
 @Entity
@@ -17,7 +19,7 @@ import java.util.Set;
 public class Staff {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private long id;
 
     @OneToOne
     @JsonManagedReference
@@ -29,19 +31,20 @@ public class Staff {
     private String personalEmail;
     private String workEmail;
 
-    @OneToOne
+    @ManyToOne
     @JsonManagedReference
-    @JoinColumn
+    @JoinColumn(unique = false)
     private Department department;
 
-    @OneToOne
+    @ManyToOne
     @JsonManagedReference
-    @JoinColumn
+    @JoinColumn(unique = false)
     private Location location;
 
     private String jobTitle;
 
-    private Date dateOfBirth;
+    @JsonFormat(pattern = "yyyy-MM-dd")
+    private LocalDate dateOfBirth;
 
     @ManyToOne
     @JoinColumn(name = "supervisor_id", referencedColumnName = "id")
@@ -49,9 +52,10 @@ public class Staff {
     private Staff supervisor;
 
     @OneToMany(mappedBy = "supervisor")
-    private Set<Staff> directReports;
+    private List<Staff> directReports;
 
     private double currentSalary;
     private int jobLevel;
-    private Date createdDate;
+    @JsonFormat(pattern = "yyyy-MM-dd")
+    private LocalDate createdDate;
 }

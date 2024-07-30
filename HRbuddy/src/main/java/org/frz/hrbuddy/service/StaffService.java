@@ -13,7 +13,10 @@ import org.frz.hrbuddy.repository.UserRepository;
 import org.frz.hrbuddy.util.StaffUtil;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
 
 @Service
@@ -46,22 +49,34 @@ public class StaffService {
                 .jobTitle(staffDto.getJobTitle())
                 .jobLevel(staffDto.getJobLevel())
                 .currentSalary(staffDto.getCurrentSalary())
-                .createdDate(new Date())
+                .createdDate(LocalDate.now())
                 .build();
 
         staffRepository.save(staff);
-        return staff.getName();
+        return staff.getUser().getUsername();
     }
 
     public String editStaff(Long staffId, StaffDto staffDto){
         Staff staff = staffRepository.findById(staffId).orElse(null);
         if (staff != null) {
-        staff.setDepartment((departmentRepository.findById(staffDto.getDepartmentId())));
-        staff.setPosition(staffDto.getPosition());
-        staff.setDepartment(departmentRepository.findById(staffDto.getDepartmentId()));
-        staff.setJobTitle(staffDto.getJobTitle());
-        staff.setJobLevel(staffDto.getJobLevel());
-        staff.setCurrentSalary(staffDto.getCurrentSalary());
+            if(staffDto.getDepartmentId() != 0){
+                staff.setDepartment((departmentRepository.findById(staffDto.getDepartmentId())));
+            }
+            if(staffDto.getLocationId() != 0){
+                staff.setLocation((locationRepository.findById(staffDto.getLocationId())));
+            }
+            if(staffDto.getPosition() != null){
+                staff.setPosition(staffDto.getPosition());
+            }
+            if(staffDto.getJobTitle() != null){
+                staff.setJobTitle(staffDto.getJobTitle());
+            }
+            if(staffDto.getJobLevel() != 0){
+                staff.setJobLevel(staffDto.getJobLevel());
+            }
+            if(staffDto.getCurrentSalary() != 0){
+                staff.setCurrentSalary(staffDto.getCurrentSalary());
+            }
 
         staffRepository.save(staff);
         return staff.getName();
@@ -82,8 +97,10 @@ public class StaffService {
         Staff staff = staffRepository.findById(staffId).orElse(null);
         Staff supervisor = staffRepository.findById(supervisorId).orElse(null);
 
+
         if (staff != null && supervisor != null) {
             staff.setSupervisor(supervisor);
+            staffRepository.save(staff);
             return "Successful";
         }
         else{
@@ -91,17 +108,26 @@ public class StaffService {
         }
     }
 
-    public Staff findStaff(Long staffId){
-        return staffRepository.findById(staffId).orElse(null);
+    public StaffDto findStaff(Long staffId) {
+        Staff staff = staffRepository.findById(staffId).orElse(null);
+        if (staff != null) {
+            return StaffDto.from(staff);
+        }
+        return null;
     }
 
-    public Staff findStaff(String username){
+    public StaffDto findStaff(String username){
         User user = userRepository.findByUsername(username);
-        return staffRepository.findByUser(user);
+        return StaffDto.from(staffRepository.findByUser(user));
     }
 
-    public List<Staff> findAllStaff(){
-        return staffRepository.findAll();
+    public List<StaffDto> findAllStaff(){
+        List<Staff> staffs = staffRepository.findAll();
+        List<StaffDto> staffDtos = new ArrayList<>();
+        for (Staff staff : staffs) {
+            staffDtos.add(StaffDto.from(staff));
+        }
+        return staffDtos;
     }
 
     public String changeSalary(Long staffId, double salary) {

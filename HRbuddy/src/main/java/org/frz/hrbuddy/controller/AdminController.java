@@ -31,13 +31,13 @@ public class AdminController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Staff> getStaff(@PathVariable Long id){
-        Staff staff = staffService.findStaff(id);
+    public ResponseEntity<StaffDto> getStaff(@PathVariable Long id){
+        StaffDto staff = staffService.findStaff(id);
         return ResponseEntity.ok(staff);
     }
 
     @GetMapping("/all-staff")
-    public ResponseEntity<List<Staff>> getAllStaff(){
+    public ResponseEntity<List<StaffDto>> getAllStaff(){
         return ResponseEntity.ok(staffService.findAllStaff());
     }
 
